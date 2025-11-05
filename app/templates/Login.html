@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EnerTech - Inicio de Sesión</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/Logoico.ico') }}" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+
+  <!-- Fuentes e iconos -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+  <!-- Configuración Tailwind -->
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#019863",
+            "background-light": "#f5f8f7",
+            "background-dark": "#0f1117",
+            "surface-light": "#FFFFFF",
+            "surface-dark": "#1a1d25",
+            "text-light": "#212121",
+            "text-dark": "#e8eaed",
+            "text-secondary-light": "#757575",
+            "text-secondary-dark": "#9aa0a6",
+          },
+          fontFamily: { display: "Space Grotesk" },
+          borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+          keyframes: {
+            fadeIn: {
+              "0%": { opacity: "0", transform: "translateY(-10px)" },
+              "100%": { opacity: "1", transform: "translateY(0)" },
+            },
+          },
+          animation: { "fade-in": "fadeIn 0.4s ease-out" },
+        },
+      },
+    };
+  </script>
+
+  <!-- Estilos personalizados -->
+  <style>
+    body { font-family: 'Poppins', sans-serif; transition: background-color 0.3s ease, color 0.3s ease; }
+
+    #theme-toggle .sun-icon, #theme-toggle.dark .moon-icon { display: none; }
+    #theme-toggle.dark .sun-icon, #theme-toggle .moon-icon { display: block; }
+    #theme-toggle.active .moon-icon, #theme-toggle.active .sun-icon { transform: rotate(360deg); transition: transform 0.5s; }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display">
+
+  <!-- Botón de modo oscuro -->
+  <div class="absolute top-4 right-4">
+    <button
+      id="theme-toggle"
+      type="button"
+      class="text-text-secondary-dark dark:text-text-secondary-light hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5"
+    >
+      <span class="material-symbols-outlined moon-icon">dark_mode</span>
+      <span class="material-symbols-outlined sun-icon">light_mode</span>
+    </button>
+  </div>
+
+  <!-- Contenedor principal -->
+  <div class="flex flex-col items-center justify-center min-h-screen">
+    <div class="w-full max-w-md p-8 m-4 bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg">
+
+      <!-- Logo y título -->
+      <div class="flex flex-col items-center mb-8">
+        <img src="{{ url_for('static', filename='img/Logo.jpg') }}" alt="EnerTech Logo" class="h-24 object-contain mb-4" />
+        <h1 class="text-2xl font-bold text-primary">EnerTech</h1>
+      </div>
+
+      <!-- Mensajes flash -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="text-center mb-6 p-3 rounded-lg animate-fade-in {% if category == 'success' %}bg-green-700 text-white{% else %}bg-red-700 text-white{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <!-- Título y descripción -->
+      <h2 class="text-3xl font-bold text-center text-text-light dark:text-text-dark mb-2">
+        Bienvenido a EnerTech
+      </h2>
+      <p class="text-center text-text-secondary-light dark:text-text-secondary-dark mb-8">
+        Inicia sesión para gestionar tu consumo energético.
+      </p>
+
+      <!-- Formulario login -->
+      <form action="{{ url_for('main.login') }}" method="POST">
+        <!-- Correo -->
+        <div class="mb-4">
+          <label for="correo" class="block text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark mb-2">
+            Correo Electrónico
+          </label>
+          <div class="relative">
+            <span class="material-icons absolute inset-y-0 left-0 flex items-center pl-3 text-text-secondary-light dark:text-text-secondary-dark">email</span>
+            <input id="correo" name="correo" type="email" required
+              class="w-full pl-10 pr-4 py-2 bg-background-light dark:bg-[#181a20] text-text-light dark:text-text-dark border border-gray-300 dark:border-gray-700 rounded-md focus:ring-primary focus:border-primary"
+            />
+          </div>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="mb-6">
+          <label for="contraseña" class="block text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark mb-2">
+            Contraseña
+          </label>
+          <div class="relative">
+            <span class="material-icons absolute inset-y-0 left-0 flex items-center pl-3 text-text-secondary-light dark:text-text-secondary-dark">lock</span>
+            <input id="contraseña" name="contraseña" type="password" required
+              class="w-full pl-10 pr-4 py-2 bg-background-light dark:bg-[#181a20] text-text-light dark:text-text-dark border border-gray-300 dark:border-gray-700 rounded-md focus:ring-primary focus:border-primary"
+            />
+          </div>
+          <div class="text-right mt-2">
+            <a href="#" class="text-sm text-primary hover:underline">¿Olvidaste tu contraseña?</a>
+          </div>
+        </div>
+
+        <!-- Botón -->
+        <div class="mb-6">
+          <button type="submit"
+            class="w-full bg-primary text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-300 ease-in-out"
+          >
+            Iniciar Sesión
+          </button>
+        </div>
+
+        <!-- Registro -->
+        <p class="text-sm text-center text-text-secondary-light dark:text-text-secondary-dark">
+          ¿No tienes una cuenta?
+          <a href="{{ url_for('main.registrarse') }}" class="font-medium text-primary hover:underline">Regístrate</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Script modo oscuro -->
+  <script>
+    const themeToggleBtn = document.getElementById('theme-toggle');
+
+    // Inicializar tema según localStorage o preferencia
+    if (localStorage.getItem('color-theme') === 'dark' ||
+        (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      themeToggleBtn.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      themeToggleBtn.classList.remove('dark');
+    }
+
+    themeToggleBtn.addEventListener('click', function () {
+      document.documentElement.classList.toggle('dark');
+      this.classList.toggle('dark');
+      this.classList.toggle('active');
+
+      if (localStorage.getItem('color-theme')) {
+        localStorage.setItem('color-theme', localStorage.getItem('color-theme') === 'light' ? 'dark' : 'light');
+      } else {
+        localStorage.setItem('color-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+      }
+
+      setTimeout(() => this.classList.remove('active'), 500);
+    });
+  </script>
+
+</body>
+</html>

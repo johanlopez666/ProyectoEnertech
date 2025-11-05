@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EnerTech - Comunidad</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/Logoico.ico') }}" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+
+  <!-- Fuentes e íconos -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#019863",
+            "background-light": "#f5f8f7",
+            "background-dark": "#0f1117",
+            "surface-light": "#FFFFFF",
+            "surface-dark": "#1a1d25",
+            "text-light": "#212121",
+            "text-dark": "#e8eaed",
+            "text-secondary-light": "#757575",
+            "text-secondary-dark": "#9aa0a6",
+          },
+          fontFamily: {
+            display: "Space Grotesk",
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    * {
+      transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+    #theme-toggle .sun-icon { display: none; }
+    #theme-toggle.dark .moon-icon { display: none; }
+    #theme-toggle.dark .sun-icon { display: block; }
+    #sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    #sidebar.open {
+      transform: translateX(0);
+    }
+
+    /* Transiciones específicas para elementos con clases dark: */
+    [class*="dark:"] {
+      transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+    }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display flex">
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="fixed top-0 left-0 bg-surface-light dark:bg-surface-dark w-64 min-h-screen p-6 space-y-6 shadow-lg transition-transform z-50">
+    <div class="flex justify-between items-center">
+      <span class="text-xl font-bold text-primary">Menú</span>
+      <button id="toggleSidebarClose" class="text-gray-500 dark:text-gray-400">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <nav class="space-y-4">
+      <a href="{{ url_for('main.dashboard') }}" class="block text-base hover:text-primary transition">Inicio</a>
+      <a href="{{ url_for('main.anexar_factura') }}" class="block text-base hover:text-primary transition">Anexar Factura</a>
+      <a href="{{ url_for('main.grafico') }}" class="block text-base hover:text-primary transition">Gráfico</a>
+      <a href="{{ url_for('main.reportes') }}" class="block text-base hover:text-primary transition">Reportes</a>
+      <a href="{{ url_for('main.comunidad') }}" class="block text-base hover:text-primary transition">Comunidad</a>
+      <a href="{{ url_for('main.quienes_somos') }}" class="block text-base hover:text-primary transition">Quiénes Somos</a>
+      <a href="{{ url_for('main.logout') }}" class="block text-base text-red-600 hover:text-red-700 transition mt-4">Cerrar Sesión</a>
+    </nav>
+  </aside>
+
+  <!-- Contenedor principal -->
+  <div class="flex-1 flex flex-col min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-surface-light dark:bg-surface-dark shadow flex justify-between items-center px-6 py-4">
+      <div class="flex items-center space-x-4 cursor-pointer" id="toggleSidebarOpen">
+        <img src="{{ url_for('static', filename='img/Logo.jpg') }}" alt="EnerTech Logo" class="h-10 w-auto rounded-md" />
+        <span class="text-xl font-bold text-primary">EnerTech</span>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <!-- Botón modo oscuro -->
+        <button id="theme-toggle" class="text-text-secondary-dark dark:text-text-secondary-light p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
+          <span class="material-symbols-outlined moon-icon">dark_mode</span>
+          <span class="material-symbols-outlined sun-icon">light_mode</span>
+        </button>
+
+        <!-- Menú de usuario -->
+        <div class="relative">
+          <button id="user-menu-toggle" class="flex items-center space-x-1 text-text-light dark:text-text-dark bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 p-2 rounded-md transition">
+            <span class="material-symbols-outlined text-2xl">account_circle</span>
+            <span class="material-symbols-outlined text-lg">arrow_drop_down</span>
+          </button>
+          
+          <!-- Menú desplegable -->
+          <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-surface-light dark:bg-surface-dark rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+            <div class="py-1">
+              <a href="#" class="block px-4 py-2 text-sm text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700 transition">Mi perfil</a>
+              <a href="#" class="block px-4 py-2 text-sm text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700 transition">Configuración</a>
+              <hr class="border-gray-200 dark:border-gray-700 my-1">
+              <a href="{{ url_for('main.logout') }}" class="block px-4 py-2 text-sm text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cerrar sesión</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="flex-1 bg-background-light dark:bg-background-dark p-8 relative min-h-screen">
+      <div class="max-w-7xl mx-auto">
+        <!-- Banner de comunidad -->
+        <div class="flex items-center gap-4 mb-8">
+          <img src="{{ url_for('static', filename='img/comunidad.png') }}" alt="Comunidad" class="h-16 md:h-20 w-auto" />
+          <div>
+            <h1 class="text-4xl md:text-5xl font-bold text-text-light dark:text-white mb-2">Comunidad</h1>
+            <p class="text-lg text-text-secondary-light dark:text-text-secondary-dark">
+              Bienvenido a la comunidad de EnerTech. Comparte consejos, experiencias y aprende junto a otros usuarios.
+            </p>
+          </div>
+        </div>
+
+        <!-- Grid de dos columnas -->
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- Columna izquierda: Publicaciones -->
+          <div class="md:col-span-2 space-y-6">
+            <!-- Formulario de publicación -->
+            <form method="POST" action="{{ url_for('main.comunidad') }}" class="bg-surface-light dark:bg-surface-dark rounded-xl p-4 shadow-lg">
+              <div class="flex gap-3">
+                <input 
+                  type="text" 
+                  name="mensaje" 
+                  id="mensaje"
+                  placeholder="Escribe tu mensaje aquí..." 
+                  required
+                  class="flex-1 px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 text-text-light dark:text-text-dark border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <button 
+                  type="submit"
+                  class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-green-700 transition font-semibold"
+                >
+                  Publicar
+                </button>
+              </div>
+            </form>
+
+            <!-- Lista de publicaciones -->
+            <div id="publicaciones" class="space-y-4">
+              {% if mensajes %}
+                {% for mensaje in mensajes %}
+                <div class="bg-surface-light dark:bg-surface-dark rounded-xl p-4 shadow-lg">
+                  <div class="flex items-start gap-4">
+                    <!-- Avatar -->
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0" 
+                         style="background-color: {{ mensaje.color_avatar }};">
+                      <span class="material-symbols-outlined">{{ mensaje.icono }}</span>
+                    </div>
+                    
+                    <!-- Contenido -->
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-2">
+                        <span class="font-semibold text-text-light dark:text-white">{{ mensaje.usuario }}</span>
+                        <span class="text-sm text-text-secondary-light dark:text-text-secondary-dark">{{ mensaje.tiempo }}</span>
+                      </div>
+                      <p class="text-text-light dark:text-text-dark">{{ mensaje.texto }}</p>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              {% else %}
+                <!-- Mensajes de ejemplo si no hay mensajes -->
+                <div class="bg-surface-light dark:bg-surface-dark rounded-xl p-4 shadow-lg">
+                  <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white flex-shrink-0">
+                      <span class="material-symbols-outlined">person</span>
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-2">
+                        <span class="font-semibold text-text-light dark:text-white">Usuario1</span>
+                        <span class="text-sm text-text-secondary-light dark:text-text-secondary-dark">2 días ago</span>
+                      </div>
+                      <p class="text-text-light dark:text-text-dark">He reducido el uso del aire acondicionado y he notado una disminución en la factura eléctrica.</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="bg-surface-light dark:bg-surface-dark rounded-xl p-4 shadow-lg">
+                  <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white flex-shrink-0">
+                      <span class="material-symbols-outlined">person</span>
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-2">
+                        <span class="font-semibold text-text-light dark:text-white">Usuario2</span>
+                        <span class="text-sm text-text-secondary-light dark:text-text-secondary-dark">3 días ago</span>
+                      </div>
+                      <p class="text-text-light dark:text-text-dark">Desconecto los electrodomésticos en standby y he ahorrado un montón.</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="bg-surface-light dark:bg-surface-dark rounded-xl p-4 shadow-lg">
+                  <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center text-white flex-shrink-0">
+                      <span class="material-symbols-outlined">person</span>
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-2">
+                        <span class="font-semibold text-text-light dark:text-white">Usuario3</span>
+                        <span class="text-sm text-text-secondary-light dark:text-text-secondary-dark">4 días ago</span>
+                      </div>
+                      <p class="text-text-light dark:text-text-dark">He cambiado todas las bombillas por LED y el cambio se nota en mi consumo.</p>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Columna derecha: Logros y Tips -->
+          <div class="space-y-6">
+            <!-- Logros colectivos -->
+            <div class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 shadow-lg">
+              <h2 class="text-2xl font-bold text-text-light dark:text-white mb-4">Metas</h2>
+              <p class="text-base text-text-secondary-light dark:text-text-secondary-dark mb-4">
+                "Ahorrar energía no solo reduce el consumo y los costos, también impulsa un uso más inteligente de los recursos y un impacto positivo en la comunidad"
+              </p>
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-2xl">eco</span>
+                <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">
+                  “Nuestra meta es que la comunidad Enertech ahorre más de 500 kWh al año.”
+                </p>
+              </div>
+            </div>
+
+            <!-- Tips del mes -->
+            <div class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 shadow-lg">
+              <h2 class="text-2xl font-bold text-text-light dark:text-white mb-4">Tips para ahorrar</h2>
+              <div class="space-y-4">
+                {% if tips %}
+                  {% for tip in tips %}
+                  <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-orange-500 text-2xl flex-shrink-0">lightbulb</span>
+                    <p class="text-base text-text-secondary-light dark:text-text-secondary-dark">
+                      {{ tip }}
+                    </p>
+                  </div>
+                  {% endfor %}
+                {% else %}
+                  <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-orange-500 text-2xl flex-shrink-0">lightbulb</span>
+                    <p class="text-base text-text-secondary-light dark:text-text-secondary-dark">
+                      Plancha tu ropa una sola vez a la semana para ahorrar energía
+                    </p>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Copyright -->
+      <footer class="absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-text-secondary-light dark:text-text-secondary-dark text-center whitespace-nowrap">
+        © 2025 EnerTech. Todos los derechos reservados.
+      </footer>
+    </main>
+  </div>
+
+  <!-- Script -->
+  <script>
+    const themeToggle = document.getElementById('theme-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const openSidebar = document.getElementById('toggleSidebarOpen');
+    const closeSidebar = document.getElementById('toggleSidebarClose');
+
+    // Inicializar tema
+    if (localStorage.getItem('color-theme') === 'dark' ||
+        (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      if (themeToggle) themeToggle.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      if (themeToggle) themeToggle.classList.remove('dark');
+    }
+
+    // Toggle tema
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        themeToggle.classList.toggle('dark');
+        localStorage.setItem('color-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+      });
+    }
+
+    // Sidebar
+    if (openSidebar) {
+      openSidebar.addEventListener('click', () => sidebar.classList.add('open'));
+    }
+    if (closeSidebar) {
+      closeSidebar.addEventListener('click', () => sidebar.classList.remove('open'));
+    }
+
+    // Menú de usuario desplegable
+    const userMenuToggle = document.getElementById('user-menu-toggle');
+    const userMenu = document.getElementById('user-menu');
+    
+    if (userMenuToggle && userMenu) {
+      userMenuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userMenu.classList.toggle('hidden');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!userMenuToggle.contains(e.target) && !userMenu.contains(e.target)) {
+          userMenu.classList.add('hidden');
+        }
+      });
+    }
+
+    // Limpiar el campo de texto después de enviar (si el formulario se envió con éxito)
+    const mensajeInput = document.getElementById('mensaje');
+    if (mensajeInput && mensajeInput.value === '') {
+      // El campo ya está vacío, no hacer nada
+    }
+  </script>
+</body>
+</html>
+

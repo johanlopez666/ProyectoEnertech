@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EnerTech - Gráfico</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/Logoico.ico') }}" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+  <!-- Fuentes e íconos -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#019863",
+            "background-light": "#f5f8f7",
+            "background-dark": "#0f1117",
+            "surface-light": "#FFFFFF",
+            "surface-dark": "#1a1d25",
+            "text-light": "#212121",
+            "text-dark": "#e8eaed",
+            "text-secondary-light": "#757575",
+            "text-secondary-dark": "#9aa0a6",
+          },
+          fontFamily: { display: "Space Grotesk" },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    * { transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease; }
+    body { font-family: 'Space Grotesk', sans-serif; }
+    #theme-toggle .sun-icon { display: none; }
+    #theme-toggle.dark .moon-icon { display: none; }
+    #theme-toggle.dark .sun-icon { display: block; }
+    #sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
+    #sidebar.open { transform: translateX(0); }
+    [class*="dark:"] { transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease; }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display flex">
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="fixed top-0 left-0 bg-surface-light dark:bg-surface-dark w-64 min-h-screen p-6 space-y-6 shadow-lg z-50">
+    <div class="flex justify-between items-center">
+      <span class="text-xl font-bold text-primary">Menú</span>
+      <button id="toggleSidebarClose" class="text-gray-500 dark:text-gray-400">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <nav class="space-y-4">
+      <a href="{{ url_for('main.dashboard') }}" class="block text-base hover:text-primary transition">Inicio</a>
+      <a href="{{ url_for('main.anexar_factura') }}" class="block text-base hover:text-primary transition">Anexar Factura</a>
+      <a href="{{ url_for('main.grafico') }}" class="block text-base hover:text-primary transition">Gráfico</a>
+      <a href="{{ url_for('main.reportes') }}" class="block text-base hover:text-primary transition">Reportes</a>
+      <a href="{{ url_for('main.comunidad') }}" class="block text-base hover:text-primary transition">Comunidad</a>
+      <a href="{{ url_for('main.quienes_somos') }}" class="block text-base hover:text-primary transition">Quiénes Somos</a>
+      <a href="{{ url_for('main.logout') }}" class="block text-base text-red-600 hover:text-red-700 transition mt-4">Cerrar Sesión</a>
+    </nav>
+  </aside>
+
+  <!-- Contenedor principal -->
+  <div class="flex-1 flex flex-col min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-surface-light dark:bg-surface-dark shadow flex justify-between items-center px-6 py-4">
+      <div class="flex items-center space-x-4 cursor-pointer" id="toggleSidebarOpen">
+        <img src="{{ url_for('static', filename='img/Logo.jpg') }}" alt="EnerTech Logo" class="h-10 w-auto rounded-md" />
+        <span class="text-xl font-bold text-primary">EnerTech</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <button id="theme-toggle" class="text-text-secondary-dark dark:text-text-secondary-light p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
+          <span class="material-symbols-outlined moon-icon">dark_mode</span>
+          <span class="material-symbols-outlined sun-icon">light_mode</span>
+        </button>
+        <div class="relative">
+          <button id="user-menu-toggle" class="flex items-center space-x-1 text-text-light dark:text-text-dark bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 p-2 rounded-md transition">
+            <span class="material-symbols-outlined text-2xl">account_circle</span>
+            <span class="material-symbols-outlined text-lg">arrow_drop_down</span>
+          </button>
+          <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-surface-light dark:bg-surface-dark rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+            <div class="py-1">
+              <a href="#" class="block px-4 py-2 text-sm text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700 transition">Mi perfil</a>
+              <a href="#" class="block px-4 py-2 text-sm text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700 transition">Configuración</a>
+              <hr class="border-gray-200 dark:border-gray-700 my-1">
+              <a href="{{ url_for('main.logout') }}" class="block px-4 py-2 text-sm text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cerrar sesión</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="flex-1 bg-background-light dark:bg-background-dark p-8 relative min-h-screen">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-8">
+          <h1 class="text-4xl md:text-5xl font-bold text-text-light dark:text-white mb-4">Gráfico</h1>
+          <!-- Botón para ver reportes -->
+          <a href="{{ url_for('main.reportes') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition shadow-lg">
+            <span class="material-symbols-outlined">description</span>
+            <span>Ver Reporte Detallado</span>
+          </a>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- Gráfico de barras -->
+          <div class="md:col-span-2 bg-surface-light dark:bg-surface-dark rounded-xl p-6 shadow-lg">
+            <h2 class="text-2xl font-bold text-text-light dark:text-white mb-4">Consumo Energético Mensual</h2>
+            <div class="flex items-center gap-6 mb-4">
+              <div class="flex items-center gap-2">
+                <div class="w-4 h-4 bg-primary rounded"></div>
+                <span class="text-sm text-text-light dark:text-text-dark">Consumo (kWh)</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="w-4 h-4 border-2 border-yellow-500 border-dashed"></div>
+                <span class="text-sm text-text-light dark:text-text-dark">Promedio</span>
+              </div>
+            </div>
+            <div class="relative h-96">
+              <canvas id="consumoChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Indicador de nivel de consumo -->
+          <div class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 shadow-lg">
+            <h2 class="text-2xl font-bold text-text-light dark:text-white mb-6">Nivel de Consumo Actual</h2>
+            <div class="flex flex-col items-center">
+              <div class="relative w-24 h-64 bg-gray-200 dark:bg-gray-700 rounded-full flex flex-col-reverse overflow-hidden">
+                <div class="w-full bg-green-500 h-1/3"></div>
+                <div class="w-full bg-yellow-500 h-1/3"></div>
+                <div class="w-full bg-red-500 h-1/3"></div>
+                <div id="consumo-indicator" class="absolute w-full bg-white dark:bg-gray-300 border-2 border-gray-800 dark:border-gray-900 rounded" style="bottom: 0; height: 4px;"></div>
+              </div>
+              <div class="mt-6 text-center">
+                <p id="nivel-text" class="text-lg font-bold text-text-light dark:text-white mb-2">-</p>
+                <p id="consumo-text" class="text-sm text-text-secondary-light dark:text-text-secondary-dark">-</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-text-secondary-light dark:text-text-secondary-dark text-center whitespace-nowrap">
+        © 2025 EnerTech. Todos los derechos reservados.
+      </footer>
+    </main>
+  </div>
+
+  <!-- Script -->
+  <script>
+// Sidebar y tema
+const themeToggle = document.getElementById('theme-toggle');
+const sidebar = document.getElementById('sidebar');
+const openSidebar = document.getElementById('toggleSidebarOpen');
+const closeSidebar = document.getElementById('toggleSidebarClose');
+const userMenuToggle = document.getElementById('user-menu-toggle');
+const userMenu = document.getElementById('user-menu');
+
+if (localStorage.getItem('color-theme') === 'dark' ||
+    (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+  document.documentElement.classList.add('dark');
+  themeToggle.classList.add('dark');
+} else {
+  document.documentElement.classList.remove('dark');
+  themeToggle.classList.remove('dark');
+}
+
+themeToggle.addEventListener('click', () => {
+  document.documentElement.classList.toggle('dark');
+  themeToggle.classList.toggle('dark');
+  localStorage.setItem('color-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+  updateChartColors();
+});
+
+openSidebar.addEventListener('click', () => sidebar.classList.add('open'));
+closeSidebar.addEventListener('click', () => sidebar.classList.remove('open'));
+userMenuToggle.addEventListener('click', e => { e.stopPropagation(); userMenu.classList.toggle('hidden'); });
+document.addEventListener('click', e => { if (!userMenuToggle.contains(e.target) && !userMenu.contains(e.target)) userMenu.classList.add('hidden'); });
+
+// Gráfico
+const textColor = document.documentElement.classList.contains('dark') ? '#e8eaed' : '#212121';
+const gridColor = document.documentElement.classList.contains('dark') ? 'rgba(156, 163, 175, 0.2)' : 'rgba(156, 163, 175, 0.3)';
+
+const meses = {{ labels|tojson }};
+const consumos = {{ consumos|tojson }};
+const promedios = {{ promedios|tojson }};
+const ultimoPromedio = promedios.length ? promedios[promedios.length-1] : 0;
+
+const ctx = document.getElementById('consumoChart').getContext('2d');
+const consumoChart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: meses,
+    datasets: [
+      {
+        label: 'Consumo (kWh)',
+        data: consumos,
+        backgroundColor: consumos.map(c => {
+          if(c < ultimoPromedio) return '#22c55e';
+          if(c <= ultimoPromedio+1) return '#eab308';
+          return '#ef4444';
+        }),
+        borderColor: consumos.map(c => {
+          if(c < ultimoPromedio) return '#22c55e';
+          if(c <= ultimoPromedio+1) return '#eab308';
+          return '#ef4444';
+        }),
+        borderWidth: 1,
+        order: 2
+      },
+      {
+        label: 'Promedio',
+        type: 'line',
+        data: Array(consumos.length).fill(ultimoPromedio),
+        borderColor: '#eab308',
+        borderWidth: 2,
+        borderDash: [5,5],
+        fill: false,
+        pointRadius: 0,
+        pointHoverRadius: 0,
+        order: 1,
+        datalabels: {
+          display: true,
+          color: '#eab308',
+          anchor: 'end',
+          align: 'top',
+          font: { weight: 'bold', size: 12 },
+          formatter: () => `${ultimoPromedio} kWh`
+        }
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true },
+      datalabels: { display: true }
+    },
+    scales: {
+      y: { beginAtZero: true, ticks: { stepSize: 20, color: textColor }, grid: { color: gridColor } },
+      x: { ticks: { color: textColor }, grid: { color: gridColor } }
+    }
+  },
+  plugins: [ChartDataLabels]
+});
+
+function updateChartColors() {
+  const isDark = document.documentElement.classList.contains('dark');
+  const textColorNew = isDark ? '#e8eaed' : '#212121';
+  const gridColorNew = isDark ? 'rgba(156, 163, 175, 0.2)' : 'rgba(156, 163, 175, 0.3)';
+  consumoChart.options.scales.x.ticks.color = textColorNew;
+  consumoChart.options.scales.x.grid.color = gridColorNew;
+  consumoChart.options.scales.y.ticks.color = textColorNew;
+  consumoChart.options.scales.y.grid.color = gridColorNew;
+  consumoChart.update();
+}
+
+const observer = new MutationObserver(updateChartColors);
+observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+// Indicador vertical (termómetro) - flecha sobre la franja correspondiente
+const indicador = document.getElementById('consumo-indicator');
+const nivelText = document.getElementById('nivel-text');
+const consumoText = document.getElementById('consumo-text');
+
+function actualizarIndicador() {
+  if (!consumos.length) return;
+
+  const ultimo = consumos[consumos.length - 1];
+  const termometroHeight = 100; // porcentaje
+  let posicion = 0;
+
+  if (ultimo < ultimoPromedio) {
+    nivelText.textContent = 'Bajo (Verde)';
+    posicion = termometroHeight / 6; // centro de la franja verde
+  } else if (ultimo <= ultimoPromedio + 1) {
+    nivelText.textContent = 'Moderado (Amarillo)';
+    posicion = termometroHeight / 2; // centro de la franja amarilla
+  } else {
+    nivelText.textContent = 'Alto (Rojo)';
+    posicion = termometroHeight * 5 / 6; // centro de la franja roja
+  }
+
+  // Animación suave con transición
+  indicador.style.transition = 'bottom 0.8s ease';
+  indicador.style.bottom = `${posicion}%`;
+  indicador.style.backgroundColor = '#ffffff';
+  consumoText.textContent = `${ultimo} kWh`;
+}
+
+actualizarIndicador();
+</script>
+</body>
+</html>

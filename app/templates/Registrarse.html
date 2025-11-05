@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EnerTech - Registro</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/Logoico.ico') }}" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <!-- Fuentes -->
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap"
+  />
+
+  <!-- Material Symbols (iconos) -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+  <style>
+    body {
+      font-family: "Space Grotesk", "Noto Sans", sans-serif;
+      background-color: #0f1117;
+      color: #e8eaed;
+      min-height: 100vh;
+    }
+
+    input {
+      background-color: #181a20 !important;
+      border: none !important;
+      color: #e8eaed !important;
+    }
+
+    input::placeholder {
+      color: #9aa0a6 !important;
+    }
+
+    button {
+      background-color: #019863;
+    }
+
+    button:hover {
+      background-color: #017a50;
+    }
+
+    header {
+      background-color: #181a20;
+    }
+
+    /* Iconos del toggle: mostramos uno u otro según la clase `dark` en <html> */
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+      vertical-align: middle;
+    }
+    /* Por defecto ocultamos el icono del sol (se mostrará en modo claro) */
+    .sun-icon,
+    .moon-icon {
+      display: inline-block;
+      line-height: 1;
+    }
+    html.dark .sun-icon {
+      display: inline-block; /* en dark mostramos el sol (para indicar que al pulsar irá a light) */
+    }
+    html.dark .moon-icon {
+      display: none;
+    }
+    html:not(.dark) .sun-icon {
+      display: none;
+    }
+    html:not(.dark) .moon-icon {
+      display: inline-block; /* en light mostramos la luna (para indicar que al pulsar irá a dark) */
+    }
+
+    /* Ajustes visuales del botón para que no rompa el diseño */
+    #theme-toggle {
+      background: transparent;
+      border: none;
+      color: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+
+<body class="flex flex-col items-center justify-center dark:bg-[#0f1117] dark:text-[#e8eaed]">
+  <!-- Botón de modo oscuro/claro -->
+  <div class="absolute top-4 right-4">
+    <button
+      id="theme-toggle"
+      type="button"
+      class="text-text-secondary-dark dark:text-text-secondary-light hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5"
+      aria-label="Alternar tema"
+    >
+      <span class="material-symbols-outlined moon-icon" aria-hidden="true">dark_mode</span>
+      <span class="material-symbols-outlined sun-icon" aria-hidden="true">light_mode</span>
+    </button>
+  </div>
+
+  <header class="w-full flex items-center gap-3 text-white border-b border-[#24272e] px-6 py-3 fixed top-0 left-0 bg-[#181a20] z-10">
+    <img src="{{ url_for('static', filename='img/Logo.jpg') }}" alt="EnerTech Logo" class="h-10 w-auto" />
+    <h2 class="text-lg font-bold">EnerTech</h2>
+  </header>
+
+  <!-- Contenedor centrado -->
+  <main class="flex flex-col items-center justify-center w-full px-6 py-10 mt-20 mb-10">
+    <div class="w-full max-w-md bg-[#181a20] rounded-2xl p-8 shadow-lg">
+
+      <h2 class="text-3xl font-bold text-center mb-6">Crea tu cuenta</h2>
+
+      <!-- MENSAJE FLASH -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="text-center mb-4 p-3 rounded-lg {% if category == 'success' %}bg-green-700{% else %}bg-red-700{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <!-- FORMULARIO -->
+      <form id="register-form" method="POST" action="{{ url_for('main.registrarse') }}" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-2">Nombre</label>
+          <input type="text" name="nombre" placeholder="Ingresa tu nombre" class="w-full rounded-lg h-12 px-4" required />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2">Apellido</label>
+          <input type="text" name="apellido" placeholder="Ingresa tu apellido" class="w-full rounded-lg h-12 px-4" required />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2">Número de teléfono</label>
+          <input type="tel" name="telefono" placeholder="Ingresa tu número" class="w-full rounded-lg h-12 px-4" required />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2">Dirección</label>
+          <input type="text" name="direccion" placeholder="Ingresa tu dirección" class="w-full rounded-lg h-12 px-4" required />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2">Correo electrónico</label>
+          <input type="email" name="correo" placeholder="Ingresa tu correo" class="w-full rounded-lg h-12 px-4" required />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2">Contraseña</label>
+          <input type="password" name="contrasena" placeholder="Ingresa tu contraseña" class="w-full rounded-lg h-12 px-4" required />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2">Ocupación</label>
+          <input type="text" name="ocupacion" placeholder="Ingresa tu ocupación" class="w-full rounded-lg h-12 px-4" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2">Número de personas en el hogar</label>
+          <input type="number" name="num_personas" placeholder="Ingresa el número de personas" min="1" step="1" class="w-full rounded-lg h-12 px-4" required />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2">Estrato socioeconómico</label>
+          <input type="number" name="estrato" placeholder="Ingresa tu estrato (1 - 6)" min="1" step="1" class="w-full rounded-lg h-12 px-4" required />
+        </div>
+
+        <!-- BOTÓN -->
+        <button type="submit" class="w-full h-12 rounded-lg text-white font-bold text-base mt-4 transition-colors">
+          Registrarse
+        </button>
+      </form>
+
+      <!-- LINK INFERIOR -->
+      <p class="text-sm text-center mt-6 text-[#9aa0a6]">
+        ¿Ya tienes una cuenta?
+        <a href="{{ url_for('main.login') }}" class="text-[#019863] hover:underline">Inicia sesión</a>
+      </p>
+    </div>
+  </main>
+
+  <!-- Script: modo oscuro -->
+  <script>
+    const themeToggle = document.getElementById('theme-toggle');
+    const root = document.documentElement;
+    const setAria = (isDark) => {
+      themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro');
+    };
+
+    // Inicialización según localStorage o preferencia del sistema
+    if (themeToggle) {
+      const saved = localStorage.getItem('color-theme');
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = (saved === 'dark') || (saved === null && prefersDark);
+
+      if (isDark) {
+        root.classList.add('dark');
+        themeToggle.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+        themeToggle.classList.remove('dark');
+      }
+      setAria(isDark);
+
+      themeToggle.addEventListener('click', () => {
+        const nowDark = root.classList.toggle('dark');
+        // también toggle en el botón por consistencia (no estrictamente necesario)
+        themeToggle.classList.toggle('dark', nowDark);
+        localStorage.setItem('color-theme', nowDark ? 'dark' : 'light');
+        setAria(nowDark);
+      });
+    }
+  </script>
+</body>
+</html>

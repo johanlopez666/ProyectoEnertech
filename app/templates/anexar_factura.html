@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EnerTech - Anexar Factura</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/Logoico.ico') }}" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+
+  <!-- Fuentes e íconos -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#019863",
+            "background-light": "#f5f8f7",
+            "background-dark": "#0f1117",
+            "surface-light": "#FFFFFF",
+            "surface-dark": "#1a1d25",
+            "text-light": "#212121",
+            "text-dark": "#e8eaed",
+            "text-secondary-light": "#757575",
+            "text-secondary-dark": "#9aa0a6",
+          },
+          fontFamily: {
+            display: "Space Grotesk",
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    * { transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease; }
+    body { font-family: 'Space Grotesk', sans-serif; transition: background-color 0.5s ease, color 0.5s ease; }
+    #theme-toggle .sun-icon { display: none; }
+    #theme-toggle.dark .moon-icon { display: none; }
+    #theme-toggle.dark .sun-icon { display: block; }
+    #sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
+    #sidebar.open { transform: translateX(0); }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display flex">
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="fixed top-0 left-0 bg-surface-light dark:bg-surface-dark w-64 min-h-screen p-6 space-y-6 shadow-lg transition-transform z-50">
+    <div class="flex justify-between items-center">
+      <span class="text-xl font-bold text-primary">Menú</span>
+      <button id="toggleSidebarClose" class="text-gray-500 dark:text-gray-400">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <nav class="space-y-4">
+      <a href="{{ url_for('main.dashboard') }}" class="block text-base hover:text-primary transition">Inicio</a>
+      <a href="{{ url_for('main.anexar_factura') }}" class="block text-base hover:text-primary transition">Anexar Factura</a>
+      <a href="{{ url_for('main.grafico') }}" class="block text-base hover:text-primary transition">Gráfico</a>
+      <a href="{{ url_for('main.reportes') }}" class="block text-base hover:text-primary transition">Reportes</a>
+      <a href="{{ url_for('main.comunidad') }}" class="block text-base hover:text-primary transition">Comunidad</a>
+      <a href="{{ url_for('main.quienes_somos') }}" class="block text-base hover:text-primary transition">Quiénes Somos</a>
+      <a href="{{ url_for('main.logout') }}" class="block text-base text-red-600 hover:text-red-700 transition mt-4">Cerrar Sesión</a>
+    </nav>
+  </aside>
+
+  <!-- Contenedor principal -->
+  <div class="flex-1 flex flex-col min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-surface-light dark:bg-surface-dark shadow flex justify-between items-center px-6 py-4">
+      <div class="flex items-center space-x-4 cursor-pointer" id="toggleSidebarOpen">
+        <img src="{{ url_for('static', filename='img/Logo.jpg') }}" alt="EnerTech Logo" class="h-10 w-auto rounded-md" />
+        <span class="text-xl font-bold text-primary">EnerTech</span>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <button id="theme-toggle" class="text-text-secondary-dark dark:text-text-secondary-light p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
+          <span class="material-symbols-outlined moon-icon">dark_mode</span>
+          <span class="material-symbols-outlined sun-icon">light_mode</span>
+        </button>
+
+        <div class="relative">
+          <button id="user-menu-toggle" class="flex items-center space-x-1 text-text-light dark:text-text-dark bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 p-2 rounded-md transition">
+            <span class="material-symbols-outlined text-2xl">account_circle</span>
+            <span class="material-symbols-outlined text-lg">arrow_drop_down</span>
+          </button>
+          
+          <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-surface-light dark:bg-surface-dark rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+            <div class="py-1">
+              <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition">Mi perfil</a>
+              <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition">Configuración</a>
+              <hr class="border-gray-200 dark:border-gray-700 my-1">
+              <a href="{{ url_for('main.logout') }}" class="block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition">Cerrar sesión</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="flex-1 bg-background-light dark:bg-background-dark p-8 relative min-h-screen">
+      <div class="max-w-4xl mx-auto mt-12 text-center">
+        <div class="flex flex-col items-center mb-12">
+          
+          <h1 class="text-5xl md:text-6xl font-bold text-text-light dark:text-white">Anexar Factura</h1>
+          <p class="mt-3 text-lg text-text-secondary-light dark:text-text-secondary-dark">Registra tu consumo de energía para obtener análisis personalizados</p>
+          <br></br>
+          <img src="{{ url_for('static', filename='img/consumo.png') }}" alt="Consumo" class="h-30 md:h-35 w-auto mb-4" />
+        </div>
+
+        <!-- Formulario -->
+        <form method="POST" action="{{ url_for('main.guardar_consumo') }}" class="bg-surface-light dark:bg-surface-dark rounded-xl border border-gray-300 dark:border-gray-600 p-10 shadow-lg max-w-2xl mx-auto">
+          
+          <div class="mb-6">
+            <h2 class="text-2xl font-semibold text-text-light dark:text-text-dark mb-4 text-center">
+              Registro de Consumo Últimos 3 Meses
+            </h2>
+
+            <div class="grid grid-cols-3 gap-4 font-semibold text-text-light dark:text-text-dark mb-2">
+              <span>Mes</span>
+              <span>Consumo (kWh)</span>
+              <span>Promedio (kWh)</span>
+            </div>
+
+            {% for i in range(1,4) %}
+            <div class="grid grid-cols-3 gap-4 mb-4 items-center">
+              <!-- Campo de texto editable para indicar el mes -->
+              <input type="text" name="mes_{{ i }}" placeholder="Ej. Enero" required
+                     class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:ring-2 focus:ring-primary outline-none transition text-center font-semibold">
+
+              <input type="number" name="consumo_{{ i }}" step="0.01" min="0" required
+                     class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:ring-2 focus:ring-primary outline-none transition">
+
+              <input type="number" name="promedio_{{ i }}" step="0.01" min="0" required
+                     class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:ring-2 focus:ring-primary outline-none transition">
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="mt-6 w-full bg-primary text-white py-3 rounded-lg font-semibold hover:opacity-90 transition">
+              Guardar Consumo
+            </button>
+          </div>
+        </form>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="mt-6 p-4 rounded-lg {% if category == 'success' %}bg-green-700 text-white{% else %}bg-red-700 text-white{% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <footer class="absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-text-secondary-light dark:text-text-secondary-dark text-center whitespace-nowrap">
+        © 2025 EnerTech. Todos los derechos reservados.
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    const themeToggle = document.getElementById('theme-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const openSidebar = document.getElementById('toggleSidebarOpen');
+    const closeSidebar = document.getElementById('toggleSidebarClose');
+
+    if (localStorage.getItem('color-theme') === 'dark' ||
+        (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      themeToggle.classList.add('dark');
+    }
+
+    themeToggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      themeToggle.classList.toggle('dark');
+      localStorage.setItem('color-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    openSidebar.addEventListener('click', () => sidebar.classList.add('open'));
+    closeSidebar.addEventListener('click', () => sidebar.classList.remove('open'));
+
+    const userMenuToggle = document.getElementById('user-menu-toggle');
+    const userMenu = document.getElementById('user-menu');
+    if (userMenuToggle && userMenu) {
+      userMenuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userMenu.classList.toggle('hidden');
+      });
+      document.addEventListener('click', (e) => {
+        if (!userMenuToggle.contains(e.target) && !userMenu.contains(e.target)) {
+          userMenu.classList.add('hidden');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

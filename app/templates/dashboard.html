@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EnerTech - Dashboard</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/Logoico.ico') }}" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+
+  <!-- Fuentes e íconos -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#019863",
+            "background-light": "#f5f8f7",
+            "background-dark": "#0f1117",
+            "surface-light": "#FFFFFF",
+            "surface-dark": "#1a1d25",
+            "text-light": "#212121",
+            "text-dark": "#e8eaed",
+            "text-secondary-light": "#757575",
+            "text-secondary-dark": "#9aa0a6",
+          },
+          fontFamily: {
+            display: "Space Grotesk",
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    * {
+      transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+    #theme-toggle .sun-icon { display: none; }
+    #theme-toggle.dark .moon-icon { display: none; }
+    #theme-toggle.dark .sun-icon { display: block; }
+    #sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    #sidebar.open {
+      transform: translateX(0);
+    }
+
+    /* Transiciones específicas para elementos con clases dark: */
+    [class*="dark:"] {
+      transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+    }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display flex">
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="fixed top-0 left-0 bg-surface-light dark:bg-surface-dark w-64 min-h-screen p-6 space-y-6 shadow-lg transition-transform z-50">
+    <div class="flex justify-between items-center">
+      <span class="text-xl font-bold text-primary">Menú</span>
+      <button id="toggleSidebarClose" class="text-gray-500 dark:text-gray-400">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <nav class="space-y-4">
+      <a href="{{ url_for('main.dashboard') }}" class="block text-base hover:text-primary transition">Inicio</a>
+      <a href="{{ url_for('main.anexar_factura') }}" class="block text-base hover:text-primary transition">Anexar Factura</a>
+      <a href="{{ url_for('main.grafico') }}" class="block text-base hover:text-primary transition">Gráfico</a>
+      <a href="{{ url_for('main.reportes') }}" class="block text-base hover:text-primary transition">Reportes</a>
+      <a href="{{ url_for('main.comunidad') }}" class="block text-base hover:text-primary transition">Comunidad</a>
+      <a href="{{ url_for('main.quienes_somos') }}" class="block text-base hover:text-primary transition">Quiénes Somos</a>
+      <a href="{{ url_for('main.logout') }}" class="block text-base text-red-600 hover:text-red-700 transition mt-4">Cerrar Sesión</a>
+    </nav>
+  </aside>
+
+  <!-- Contenedor principal -->
+  <div class="flex-1 flex flex-col min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-surface-light dark:bg-surface-dark shadow flex justify-between items-center px-6 py-4">
+      <div class="flex items-center space-x-4 cursor-pointer" id="toggleSidebarOpen">
+        <img src="{{ url_for('static', filename='img/Logo.jpg') }}" alt="EnerTech Logo" class="h-10 w-auto rounded-md" />
+        <span class="text-xl font-bold text-primary">EnerTech</span>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <!-- Botón modo oscuro -->
+        <button id="theme-toggle" class="text-text-secondary-dark dark:text-text-secondary-light p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
+          <span class="material-symbols-outlined moon-icon">dark_mode</span>
+          <span class="material-symbols-outlined sun-icon">light_mode</span>
+        </button>
+
+        <!-- Menú de usuario -->
+        <div class="relative">
+          <button id="user-menu-toggle" class="flex items-center space-x-1 text-text-light dark:text-text-dark bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 p-2 rounded-md transition">
+            <span class="material-symbols-outlined text-2xl">account_circle</span>
+            <span class="material-symbols-outlined text-lg">arrow_drop_down</span>
+          </button>
+          
+          <!-- Menú desplegable -->
+          <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-surface-light dark:bg-surface-dark rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+            <div class="py-1">
+              <a href="#" class="block px-4 py-2 text-sm text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700 transition">Mi perfil</a>
+              <a href="#" class="block px-4 py-2 text-sm text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700 transition">Configuración</a>
+              <hr class="border-gray-200 dark:border-gray-700 my-1">
+              <a href="{{ url_for('main.logout') }}" class="block px-4 py-2 text-sm text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cerrar sesión</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="flex-1 bg-background-light dark:bg-background-dark p-8 relative min-h-screen flex items-center justify-center">
+      <!-- Mensajes flash -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div id="flash-message" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300">
+              <div class="flex items-center">
+                <span class="material-icons mr-2">check_circle</span>
+                <span>{{ message }}</span>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <div class="max-w-6xl mx-auto w-full">
+        <!-- Logo y título principal -->
+        <div class="flex flex-col items-center mb-12">
+          <!-- Logo EnerTech -->
+          <div class="flex items-center justify-center mb-6">
+            <img src="{{ url_for('static', filename='img/logosinfondo.png') }}" alt="EnerTech Logo" class="h-16 md:h-20 w-auto mr-4" />
+            <h1 class="text-4xl md:text-5xl font-bold text-primary">EnerTech</h1>
+          </div>
+          
+          <!-- Título principal -->
+          <h2 class="text-3xl md:text-4xl font-bold text-text-light dark:text-white text-center mb-8">
+            Optimiza tu consumo, cuida el planeta 🌍
+          </h2>
+        </div>
+
+        <!-- Sección de ilustración y características -->
+        <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 mb-12">
+          <!-- Ilustración de batería y hojas -->
+          <div class="flex-shrink-0">
+            <img src="{{ url_for('static', filename='img/bateriayhoja.png') }}" alt="Batería y hojas" class="max-w-[200px] md:max-w-[280px] h-auto" />
+          </div>
+
+          <!-- Características principales -->
+          <div class="space-y-6 max-w-lg">
+            <!-- Analiza -->
+            <div class="flex items-start space-x-4 text-text-light dark:text-white">
+              <span class="text-4xl">⚡</span>
+              <div>
+                <p class="font-bold text-xl md:text-2xl mb-1">
+                  <span class="font-bold">Analiza:</span> Visualiza tu consumo energético de forma clara y sencilla.
+                </p>
+              </div>
+            </div>
+
+            <!-- Ahorra -->
+            <div class="flex items-start space-x-4 text-text-light dark:text-white">
+              <span class="text-4xl">💡</span>
+              <div>
+                <p class="font-bold text-xl md:text-2xl mb-1">
+                  <span class="font-bold">Ahorra:</span> Recibe recomendaciones prácticas para reducir tus gastos.
+                </p>
+              </div>
+            </div>
+
+            <!-- Conecta -->
+            <div class="flex items-start space-x-4 text-text-light dark:text-white">
+              <span class="text-4xl">🤝</span>
+              <div>
+                <p class="font-bold text-xl md:text-2xl mb-1">
+                  <span class="font-bold">Conecta:</span> Forma parte de una comunidad comprometida con la sostenibilidad.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Copyright -->
+      <footer class="absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-text-secondary-light dark:text-text-secondary-dark text-center whitespace-nowrap">
+        © 2025 EnerTech. Todos los derechos reservados.
+      </footer>
+    </main>
+  </div>
+
+  <!-- Script -->
+  <script>
+    const themeToggle = document.getElementById('theme-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const openSidebar = document.getElementById('toggleSidebarOpen');
+    const closeSidebar = document.getElementById('toggleSidebarClose');
+
+    // Inicializar tema
+    if (localStorage.getItem('color-theme') === 'dark' ||
+        (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      if (themeToggle) themeToggle.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      if (themeToggle) themeToggle.classList.remove('dark');
+    }
+
+    // Toggle tema
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        themeToggle.classList.toggle('dark');
+        localStorage.setItem('color-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+      });
+    }
+
+    openSidebar.addEventListener('click', () => sidebar.classList.add('open'));
+    closeSidebar.addEventListener('click', () => sidebar.classList.remove('open'));
+
+    // Menú de usuario desplegable
+    const userMenuToggle = document.getElementById('user-menu-toggle');
+    const userMenu = document.getElementById('user-menu');
+    
+    if (userMenuToggle && userMenu) {
+      userMenuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userMenu.classList.toggle('hidden');
+      });
+
+      // Cerrar el menú al hacer click fuera
+      document.addEventListener('click', (e) => {
+        if (!userMenuToggle.contains(e.target) && !userMenu.contains(e.target)) {
+          userMenu.classList.add('hidden');
+        }
+      });
+    }
+
+    // Auto-cerrar mensaje flash después de 3 segundos
+    const flashMessage = document.getElementById('flash-message');
+    if (flashMessage) {
+      setTimeout(() => {
+        flashMessage.style.opacity = '0';
+        setTimeout(() => {
+          flashMessage.remove();
+        }, 300);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
+
